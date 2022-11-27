@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>IOCL</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+</head>
+  <body>
+    <nav class="navbar navbar-expand-lg fixed-top navbar-dark bg-primary">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="/">IOCL SRPL TLR</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link" aria-current="page" href="/">Statements</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" href="/generateExcelPage">Generate Excel</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/config">Configuration</a>
+            </li>
+            </ul>
+            <ul class="navbar-nav navbar-right">
+              <li class="nav-item navbar-right">
+                <a class="nav-link" href="/logout">Logout 🚪</a>
+              </li>
+            </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container-fluid bg-light">
+      <div class="container mt-5 pt-5 pb-5">
+
+        <h1 class="text-center">Generate Excel 📋</h1>
+
+        <div class="col-lg-6 mt-5 mx-auto">
+            <div class="card card-body">
+                
+                <form action="{{ url_for('generateExcel') }}" method="POST">
+                    <div class="mb-3">
+                        <label for="generateType" class="form-label">Statement Type</label>
+                        <select class="form-select" id="generateType" name="generateType" aria-describedby="generateTypeHelp" required>
+                            <option value="balanceSheetAbstract">Abstract of Balance Sheet for DEPOSIT & DISBURSAL</option>
+                            <option value="balanceSheetStatement">Statement of Balance Sheet for DEPOSIT & DISBURSAL</option>
+                            <option value="totalDepositAbstract">Abstract of CONSOLIDATED DEPOSIT</option>
+                            <option value="totalDepositStatement">Statement of CONSOLIDATED DEPOSIT</option>
+                            <option value="totalDisbursalAbstract">Abstract of CONSOLIDATED DISBURSAL</option>
+                            <option value="totalDisbursalStatement">Statement of CONSOLIDATED DISBURSAL</option>
+                            <option value="monthlyDepositAbstract">Abstract of DEPOSIT</option>
+                            <option value="monthlyDepositStatement">Statement of DEPOSIT (Date Wise)</option>
+                            <option value="monthlyDepositStatementVillageWise">Statement of DEPOSIT (Village Wise)</option>
+                            <option value="monthlyDisbursalAbstract">Abstract of DISBURSAL</option>
+                            <option value="monthlyDisbursalStatement">Statement of DISBURSAL (Date Wise)</option>
+                            <option value="monthlyDisbursalStatementVillageWise">Statement of DISBURSAL (Village Wise)</option>
+                        </select>
+                        <div id="generateTypeHelp" class="form-text">Please enter the type of statement to be generated.</div>
+                      </div>
+                    <div class="mb-3 visually-hidden" id="previousFromDateDiv">
+                      <label for="previousFromDate" class="form-label">Previous Period - From Date</label>
+                      <input type="date" class="form-control" id="previousFromDate" name="previousFromDate" aria-describedby="previousFromDateHelp"/>
+                      <div id="previousFromDateHelp" class="form-text">Please enter the previous period - from date.</div>
+                    </div>
+                    <div class="mb-3 visually-hidden" id="previousToDateDiv">
+                        <label for="previousToDate" class="form-label">Previous Period - To Date</label>
+                        <input type="date" class="form-control" id="previousToDate" name="previousToDate" aria-describedby="previousToDateHelp"/>
+                        <div id="previousToDateHelp" class="form-text">Please enter the previous period - to date.</div>
+                    </div>
+                    <div class="mb-3">
+                      <label for="fromDate" class="form-label" id="currentFromDateLabel">From Date</label>
+                      <input type="date" class="form-control" id="fromDate" name="fromDate" aria-describedby="fromDateHelp" required/>
+                      <div id="fromDateHelp" class="form-text">Please enter the from date.</div>
+                    </div>
+                    <div class="mb-3">
+                      <label for="toDate" class="form-label" id="currentToDateLabel">To Date</label>
+                      <input type="date" class="form-control" id="toDate" name="toDate" aria-describedby="toDateHelp" required/>
+                      <div id="toDateHelp" class="form-text">Please enter the to date.</div>
+                    </div>
+                    <div class="mb-3 visually-hidden" id="projectDiv">
+                      <label for="projectName" class="form-label">Project</label>
+                      <select class="form-select" id="projectName" name="projectID" required>
+                        <option value="ALL">ALL</option>
+                        {%for i in range(0, projects_count)%}
+                          <option value="{{projects_output[i].projectID}}">{{projects_output[i].projectName}}</option>
+                        {%endfor%}
+                      </select>
+                    </div>
+                    <div class="mb-3 visually-hidden" id="villageDiv">
+                      <label for="villageName" class="form-label">Village</label>
+                      <select class="form-select" id="villageName" name="villageID" required>
+                        <option value="ALL">ALL</option>
+                      </select>
+                    </div>
+                    <div class="mb-3 visually-hidden" id="noDataMonthsDiv">
+                      <label for="noDataMonths" class="form-label">No Data Months</label>
+                      <div class="form-check">
+                          <input class="form-check-input" type="radio" name="noDataMonths" id="noDataMonths1" checked value="Show">
+                        <label class="form-check-label" for="noDataMonths1">
+                          Show
+                        </label>
+                      </div>
+                      <div class="form-check">
+                          <input class="form-check-input" type="radio" name="noDataMonths" id="noDataMonths2" value="Hide">
+                        <label class="form-check-label" for="noDataMonths2">
+                          Hide
+                        </label>
+                      </div>
+                    </div>
+                    <div class="d-grid gap-2">
+                      <button type="submit" class="btn btn-primary" type="button">Generate and Download Excel</button>
+                    </div>
+                    {% if err %}
+                    <div class="text-center">
+                        <span class="badge rounded-pill bg-danger mt-2">Invalid Input</span>
+                    </div>
+                    {% endif %}
+                  </form>
+            </div>
+          </div>
+        </div>
+        </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.1.slim.min.js" integrity="sha256-w8CvhFs7iHNVUtnSP0YKEg00p9Ih13rlL9zGqvLdePA=" crossorigin="anonymous"></script>
+    <script>
+      $('#generateType').on('change', function() {
+        var generateType = this.value;
+        if(generateType == "monthlyDepositAbstract" || generateType == "monthlyDepositStatement" || generateType == "monthlyDisbursalAbstract" || generateType == "monthlyDisbursalStatement" || generateType == "balanceSheetAbstract" || generateType == "balanceSheetStatement" || generateType == "monthlyDepositStatementVillageWise" || generateType == "monthlyDisbursalStatementVillageWise") {
+          $("#previousFromDateDiv").addClass("visually-hidden");
+          $("#previousToDateDiv").addClass("visually-hidden");
+          $("#currentFromDateLabel").text("From Date");
+          $("#currentToDateLabel").text("To Date");
+          $("#fromDateHelp").text("Please enter the from date.");
+          $("#toDateHelp").text("Please enter the to date.");
+        } else {
+          $("#previousFromDateDiv").removeClass("visually-hidden");
+          $("#previousToDateDiv").removeClass("visually-hidden");
+          $("#currentFromDateLabel").text("Current Period - From Date");
+          $("#currentToDateLabel").text("Current Period - To Date");
+          $("#fromDateHelp").text("Please enter the current period - from date.");
+          $("#toDateHelp").text("Please enter the current period - to date.");
+        }
+        if(generateType == "monthlyDepositStatement" || generateType == "monthlyDisbursalStatement") {
+          $("#noDataMonthsDiv").removeClass("visually-hidden");
+          $("#projectDiv").removeClass("visually-hidden");
+          $("#villageDiv").removeClass("visually-hidden");
+        } else {
+          $("#noDataMonthsDiv").addClass("visually-hidden");
+          $("#projectDiv").addClass("visually-hidden");
+          $("#villageDiv").addClass("visually-hidden");
+        }
+      });
+
+      $('#projectName').on('change', function() {
+        var projectID = this.value;
+        if(projectID != "ALL") {
+          fetch("/getVillagesOfProject/"+projectID).then(response => {
+            return response.json();
+          }).then(data => {
+            htmlData = "<option value='ALL'>ALL</option>";
+            for (var i = 0; i < data.villages_count; i++) {
+              htmlData += "<option value="+data.villages_output[i].villageID+">"+data.villages_output[i].villageName+"</option>";
+            }
+            $("#villageName").html( htmlData );
+          }).catch(err => {
+            alert( "Error." );
+          });
+        } else {
+          htmlData = "<option value='ALL'>ALL</option>";
+          $("#villageName").html( htmlData );
+        }
+      });
+
+    </script>
+  </body>
+</html>

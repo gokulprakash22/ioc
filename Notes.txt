@@ -1,0 +1,19 @@
+py -m venv env
+env\Scripts\activate
+pip install flask
+pip install flask_pymongo
+pip install openpyxl
+pip install gunicorn
+heroku login
+pip freeze > requirements.txt
+heroku create ioclsrpl
+git init
+heroku git:remote -a ioclsrpl
+git add .
+git commit -am "base"
+git push heroku master
+
+    format_data = "%Y-%m-%d %H:%M:%S.%f"
+    generatedDate = str(datetime.strptime(str(datetime.now()), format_data).strftime("%d-%m-%Y %H:%M:%S"))
+    generatedTime = generatedDate.split(" ")[1]
+    generatedDate = generatedDate.split(" ")[0]
